@@ -1,0 +1,90 @@
+@page "/seasons"
+@using WeatherDataExam.Model.Entities
+@inject WeatherData WData
+
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h2>Meteorological Autumn</h2>
+        </div>
+        <div class="col">
+            
+        </div>
+        <div class="col">
+            <h2>Meteorological Winter</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Date</th>
+                        <th>Average Temperature (C)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var todo in meteorologicalAutumn)
+                    {
+                        <tr>
+                            <td>@todo.Date.ToShortDateString()</td>
+                            <td>@string.Format("{0:0.#}", todo.Temperature)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div>
+                <h5>Autumn started on @meteorologicalAutumn[0].Date.ToShortDateString()</h5>
+            </div>
+        </div>
+        <div class="col">
+
+        </div>
+        <div class="col">
+            @if (meteorologicalWinter.Count < 5)
+            {
+            <div class="alert alert-danger" role="alert">
+                <h3 class="text-center">5 Day sequence not found.</h3>
+            </div>
+            }
+            else
+            {
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Average Temperature (C)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var winter in meteorologicalWinter)
+                        {
+                            <tr>
+                                <td>@winter.Date.ToShortDateString()</td>
+                                <td>@string.Format("{0:0.#}", winter.Temperature)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    private IList<WeatherData> meteorologicalAutumn = new List<WeatherData>();
+    private IList<WeatherData> meteorologicalWinter = new List<WeatherData>();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        bool autumn = true;
+        bool winter = false;
+        meteorologicalAutumn = await WData.MeteorologicalSeason(autumn);
+        meteorologicalWinter = await WData.MeteorologicalSeason(winter);
+    }
+}

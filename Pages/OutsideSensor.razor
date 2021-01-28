@@ -1,0 +1,135 @@
+﻿@page "/OutsideSensor"
+@using WeatherDataExam.Model.Entities
+@using BlazorDateRangePicker
+@inject WeatherData WData
+
+<div>
+    <h1 class="text-center">Outside Sensor</h1>
+</div>
+
+<br />
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h2>Average Temperature</h2>
+        </div>
+        <div class="col"></div>
+        <div class="col">
+            <h2>Average Humidity</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div>
+                <DateRangePicker MinDate="CalendarStart" MaxDate="CalendarEnd" OnRangeSelect="OnRangeSelectTemp" StartDate="CalendarStart.AddDays(1)" EndDate="CalendarEnd">
+                    <PickerTemplate>
+                        <div class="myCalendar" id="@context.ParentId" @onclick="context.Toggle">
+                            <i class="oi oi-calendar"></i>&nbsp;
+                            <span>@context.FormattedRange @(string.IsNullOrEmpty(context.FormattedRange) ? "Select Dates..":"")</span>
+                            <i class="oi oi-chevron-bottom float-right"></i>
+                        </div>
+                        <div>
+                            <button class="btn btn-info" data-toggle="collapse" data-target="#temp" aria-expanded="false">Show/Hide</button>
+                        </div>
+
+                        <div class="collapse" id="temp">
+                            <table class="table">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Average Temperature (C)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="temp">
+                                    @foreach (var day in avgTempPerDay)
+                                    {
+                                        <tr>
+                                            <td>@day.Date.ToShortDateString()</td>
+                                            <td>@string.Format("{0:0.#}", day.Temperature) °C</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </PickerTemplate>
+                </DateRangePicker>
+            </div>
+        </div>
+        <div class="col">
+
+        </div>
+        <div class="col">
+            <div>
+                <DateRangePicker MinDate="CalendarStart" MaxDate="CalendarEnd" OnRangeSelect="OnRangeSelectHum" StartDate="CalendarStart.AddDays(1)" EndDate="CalendarEnd">
+                    <PickerTemplate>
+                        <div class="myCalendar" id="@context.ParentId" @onclick="context.Toggle">
+                            <i class="oi oi-calendar"></i>&nbsp;
+                            <span>@context.FormattedRange @(string.IsNullOrEmpty(context.FormattedRange) ? "Select Dates..":"")</span>
+                            <i class="oi oi-chevron-bottom float-right"></i>
+                        </div>
+                        <div>
+                            <button class="btn btn-info" data-toggle="collapse" data-target="#hum" aria-expanded="false">Show/Hide</button>
+                        </div>
+
+                        <div class="collapse" id="hum">
+                            <table class="table">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Average Humidity (C)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var day in avgHumPerDay)
+                                    {
+                                        <tr>
+                                            <td>@day.Date.ToShortDateString()</td>
+                                            <td>@string.Format("{0:0.#}", day.Humidity) %</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </PickerTemplate>
+                </DateRangePicker>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    private IList<WeatherData> avgTempPerDay = new List<WeatherData>();
+    private IList<WeatherData> avgHumPerDay = new List<WeatherData>();
+
+    private DateTime CalendarEnd;
+    private DateTime CalendarStart;
+
+    protected override async Task OnInitializedAsync()
+    {
+        (CalendarStart, CalendarEnd) = WData.SetStartEndDateDateRangePicker();
+    }
+
+    public void OnRangeSelectTemp(DateRange range)
+    {
+        avgTempPerDay.Clear();
+        DateTime start = range.Start.DateTime;
+        DateTime end = range.End.DateTime;
+
+        avgTempPerDay = WData.ListOfAvgDate(start, end, "ute")
+        .OrderByDescending(x => x.Temperature).ToList();
+    }
+
+    public void OnRangeSelectHum(DateRange range)
+    {
+        avgHumPerDay.Clear();
+        DateTime start = range.Start.DateTime;
+        DateTime end = range.End.DateTime;
+
+        avgHumPerDay = WData.ListOfAvgDate(start, end, "ute")
+        .OrderByDescending(x => x.Humidity).ToList();
+    }
+
+}

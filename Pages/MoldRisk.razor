@@ -1,0 +1,111 @@
+﻿@page "/moldrisk"
+@using WeatherDataExam.Model.Entities
+@using BlazorDateRangePicker
+@inject WeatherData WData
+<h3>MoldRisk</h3>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+        </div>
+        <div class="col-sm">
+            <div class="moldCalendar">
+                <DateRangePicker MinDate="CalendarStart" MaxDate="CalendarEnd" OnRangeSelect="OnRangeShowMold" StartDate="CalendarStart.AddDays(1)" EndDate="CalendarEnd">
+                    <PickerTemplate>
+                        <div class="myCalendar" id="@context.ParentId" @onclick="context.Toggle" style="background:#fff;cursor:pointer;padding: 5px 10px; width:250px; border:5px solid">
+                            <i class="oi oi-calendar"></i>&nbsp;
+                            <span>@context.FormattedRange @(string.IsNullOrEmpty(context.FormattedRange) ? "Select Dates..":"")</span>
+                            <i class="oi oi-chevron-bottom float-right"></i>
+                        </div>
+                    </PickerTemplate>
+                </DateRangePicker>
+            </div>
+        </div>
+        <div class="col-sm">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <div id="temp">
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Risk for moldgrowth outside.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="temp">
+                        @foreach (var day in moldRiskOutside)
+                        {
+                            LeMoldRisqué = (day.Humidity - 78) * (day.Temperature / 15) / 0.22;
+                            if (LeMoldRisqué < 0)
+                                LeMoldRisqué = 0;
+                            else if (LeMoldRisqué > 100)
+                                LeMoldRisqué = 100;
+                            else
+                            {
+                                <tr>
+                                    <td>@day.Date.ToShortDateString()</td>
+                                    <td>@string.Format("{0:0.#}", LeMoldRisqué) %</td>
+                                </tr>
+                            }
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-sm">
+        </div>
+        <div class="col-sm">
+            <div id="temp">
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Risk for moldgrowth inside.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="temp">
+                        @foreach (var day in moldRiskInside)
+                             { 
+                            LeMoldRisqué = (day.Humidity - 78) * (day.Temperature / 15) / 0.22;
+                            if (LeMoldRisqué < 0)
+                                LeMoldRisqué = 0;
+                            <tr>
+                                <td>@day.Date.ToShortDateString()</td>
+                                <td>@string.Format("{0:0.#}", LeMoldRisqué) %</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    private double LeMoldRisqué = 0;
+    private IList<WeatherData> moldRiskInside = new List<WeatherData>();
+    private IList<WeatherData> moldRiskOutside = new List<WeatherData>();
+
+    private DateTime CalendarEnd;
+    private DateTime CalendarStart;
+
+    protected override async Task OnInitializedAsync()
+    {
+        (CalendarStart, CalendarEnd) = WData.SetStartEndDateDateRangePicker();
+    }
+
+    public void OnRangeShowMold(DateRange range)
+    {
+        moldRiskInside.Clear();
+        moldRiskOutside.Clear();
+        DateTime start = range.Start.DateTime;
+        DateTime end = range.End.DateTime;
+        moldRiskInside = WData.MoldRisk(start,end,"inne");
+        moldRiskOutside = WData.MoldRisk(start,end,"ute");
+    }
+}

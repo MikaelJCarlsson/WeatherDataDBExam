@@ -1,0 +1,70 @@
+﻿@page "/vg"
+@using WeatherDataExam.Model.Entities
+@using BlazorDateRangePicker
+@inject Values val
+<h3>VG</h3>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+            <h4>Balcony Door</h4>
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Date</th>
+                        <th>Minutes open per day</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var b in BalconyDoorData)
+                    {
+                        <tr>
+                            <td>@b.Date.ToShortDateString()</td>
+                            <td>@string.Format("{0:0.#}", b.DoorOpenMinutes) Minutes </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm">
+            
+        </div>
+        <div class="col-sm">
+            <h4>Temperature Differences</h4>
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Date  </th>
+                        <th>Max diff</th>
+                        <th>Min diff</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in TempMinMax)
+                    {
+                        <tr>
+                            <td>@t.Date.ToShortDateString()</td>
+                            <td>@string.Format("{0:0.#}", t.MaxDiff) </td>
+                            <td>@string.Format("{0:0.#}", t.MinDiff) </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    private IList<Values> BalconyDoorData = new List<Values>();
+    private IList<Values> TempMinMax = new List<Values>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        BalconyDoorData.Clear();
+        TempMinMax.Clear();
+        TempMinMax = val.TempDiffPerDayMinMax();
+        BalconyDoorData = val.BalconyDoor();
+      
+    }
+}

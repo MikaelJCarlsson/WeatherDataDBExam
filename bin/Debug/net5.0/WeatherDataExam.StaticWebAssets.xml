@@ -1,0 +1,6 @@
+﻿<StaticWebAssets Version="1.0">
+  <ContentRoot BasePath="_content/BlazorDateRangePicker" Path="C:\Users\Micke\.nuget\packages\blazordaterangepicker\3.3.0\build\..\staticwebassets\" />
+  <ContentRoot BasePath="_content/Blazorise" Path="C:\Users\Micke\.nuget\packages\blazorise\0.9.2.5\build\..\staticwebassets\" />
+  <ContentRoot BasePath="_content/Blazorise.Bootstrap" Path="C:\Users\Micke\.nuget\packages\blazorise.bootstrap\0.9.2.5\build\..\staticwebassets\" />
+  <ContentRoot BasePath="/" Path="C:\Users\Micke\source\repos\WeatherDataExam\obj\Debug\net5.0\scopedcss\bundle\" />
+</StaticWebAssets>
